@@ -910,6 +910,10 @@ async function submitCreateUser() {
     showToast(`User "${username}" created`, 'success');
     closeModal('createUserModal');
     loadUsers();
+          rightActions += `<button class="btn btn-sm btn-danger" onclick="deleteJob(${job.id}, '${esc(job.title).replace(/'/g,"\\'")}')">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M3 6h18M8 6V4h8v2m-9 0l1 14h6l1-14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Delete
+          </button>`;
   } catch (err) {
     errEl.textContent = err.message;
     errEl.classList.remove('hidden');
@@ -922,6 +926,17 @@ async function deleteUser(id, name) {
     await DEL(`/api/users/${id}`);
     showToast(`User "${name}" deleted`, 'success');
     loadUsers();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+async function deleteJob(jobId, title) {
+  if (!confirm(`Delete job "${title}"? This cannot be undone.`)) return;
+  try {
+    await DEL(`/api/jobs/${jobId}`);
+    showToast(`Job "${title}" deleted`, 'success');
+    await loadDashboard();
   } catch (err) {
     showToast(err.message, 'error');
   }
