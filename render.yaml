@@ -11,10 +11,6 @@ services:
       - key: SESSION_SECRET
         generateValue: true
       - key: DB_DIR
-        value: /var/data
+        value: /tmp
       - key: UPLOADS_DIR
-        value: /var/data/uploads
-    disk:
-      name: job-platform-data
-      mountPath: /var/data
-      sizeGB: 1
+        value: /tmp/uploads
