@@ -235,35 +235,35 @@
       <form id="jobForm" enctype="multipart/form-data">
         <input type="hidden" id="jobFormId" />
         <div class="form-group">
-          <label>Title <span class="required">*</span></label>
+          <label id="jobTitleLabel">Title <span class="required">*</span></label>
           <input type="text" id="jobTitle" required />
         </div>
         <div class="form-group">
-          <label>Description</label>
+          <label id="jobDescriptionLabel">Description</label>
           <textarea id="jobDescription" rows="4"></textarea>
         </div>
         <div class="form-group">
-          <label>Time Limit</label>
+          <label id="jobTimeLimitLabel">Time Limit</label>
           <select id="timeLimitType" onchange="updateTimeLimitUI()">
-            <option value="none">No time limit</option>
-            <option value="fixed">Specific deadline (date & time)</option>
-            <option value="duration">Duration from acceptance (hours)</option>
-            <option value="before">Before a specific time (today)</option>
-            <option value="range">Time range (today)</option>
+            <option value="none" id="noTimeLimitOption">No time limit</option>
+            <option value="fixed" id="specificDeadlineOption">Specific deadline (date & time)</option>
+            <option value="duration" id="durationFromAcceptanceOption">Duration from acceptance (hours)</option>
+            <option value="before" id="beforeSpecificTimeOption">Before a specific time (today)</option>
+            <option value="range" id="timeRangeTodayOption">Time range (today)</option>
           </select>
         </div>
         <div id="timeLimitInputs" class="time-limit-inputs hidden">
           <!-- dynamic inputs -->
         </div>
         <div class="form-group">
-          <label>Assign to Users</label>
+          <label id="assignToUsersLabel">Assign to Users</label>
           <div id="userCheckboxList" class="user-checkbox-list">Loading…</div>
         </div>
         <div class="form-group">
-          <label>Attach Files</label>
+          <label id="attachFilesLabel">Attach Files</label>
           <div class="file-upload-area" id="fileUploadArea" onclick="document.getElementById('jobFilesInput').click()">
             <svg viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span>Click to upload files</span>
+            <span id="clickUploadText">Click to upload files</span>
           </div>
           <input type="file" id="jobFilesInput" multiple hidden onchange="handleFileSelect(event)" />
           <div id="selectedFilesList" class="selected-files-list"></div>
@@ -272,7 +272,7 @@
       </form>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('jobModal')">Cancel</button>
+      <button class="btn btn-ghost" onclick="closeModal('jobModal')" id="jobCancelBtn">Cancel</button>
       <button class="btn btn-primary" onclick="submitJobForm()" id="jobFormSubmitBtn">Post Job</button>
     </div>
   </div>
@@ -282,13 +282,13 @@
 <div id="detailsModal" class="modal-overlay hidden" onclick="closeModalOnBg(event,'detailsModal')">
   <div class="modal-box modal-box-lg">
     <div class="modal-header">
-      <h2>Job Details</h2>
+      <h2 id="detailsModalTitle">Job Details</h2>
       <button class="modal-close" onclick="closeModal('detailsModal')">×</button>
     </div>
     <div class="modal-body" id="detailsModalBody">
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('detailsModal')">Close</button>
+      <button class="btn btn-ghost" onclick="closeModal('detailsModal')" id="detailsCloseBtn">Close</button>
     </div>
   </div>
 </div>
@@ -297,19 +297,19 @@
 <div id="completeModal" class="modal-overlay hidden" onclick="closeModalOnBg(event,'completeModal')">
   <div class="modal-box modal-box-sm">
     <div class="modal-header">
-      <h2>Mark as Complete</h2>
+      <h2 id="completeModalTitle">Mark as Complete</h2>
       <button class="modal-close" onclick="closeModal('completeModal')">×</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="completeJobId" />
       <div class="form-group">
-        <label>Comments (optional)</label>
+        <label id="completeCommentsLabel">Comments (optional)</label>
         <textarea id="completeComments" rows="3"></textarea>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('completeModal')">Cancel</button>
-      <button class="btn btn-success" onclick="confirmComplete()">Confirm Complete</button>
+      <button class="btn btn-ghost" onclick="closeModal('completeModal')" id="completeCancelBtn">Cancel</button>
+      <button class="btn btn-success" onclick="confirmComplete()" id="completeConfirmBtn">Confirm Complete</button>
     </div>
   </div>
 </div>
@@ -318,29 +318,29 @@
 <div id="submitModal" class="modal-overlay hidden" onclick="closeModalOnBg(event,'submitModal')">
   <div class="modal-box modal-box-sm">
     <div class="modal-header">
-      <h2>Submit Job</h2>
+      <h2 id="submitModalTitle">Submit Job</h2>
       <button class="modal-close" onclick="closeModal('submitModal')">×</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="submitJobId" />
-      <p style="margin-bottom:1rem;color:#64748b;">Mark this job as submitted? You can optionally attach completion files.</p>
+      <p id="submitModalText" style="margin-bottom:1rem;color:#64748b;">Mark this job as submitted? You can optionally attach completion files.</p>
       <div class="form-group">
-        <label>Comment (optional)</label>
+        <label id="submitCommentLabel">Comment (optional)</label>
         <textarea id="submitComment" rows="3"></textarea>
       </div>
       <div class="form-group">
-        <label>Submission Files (optional)</label>
+        <label id="submitFilesLabel">Submission Files (optional)</label>
         <div class="file-upload-area" onclick="document.getElementById('submitFilesInput').click()">
           <svg viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <span>Click to upload files</span>
+          <span id="submitUploadText">Click to upload files</span>
         </div>
         <input type="file" id="submitFilesInput" multiple hidden onchange="handleSubmitFileSelect(event)" />
         <div id="submitFilesList" class="selected-files-list"></div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('submitModal')">Cancel</button>
-      <button class="btn btn-success" onclick="confirmSubmit()">Submit</button>
+      <button class="btn btn-ghost" onclick="closeModal('submitModal')" id="submitCancelBtn">Cancel</button>
+      <button class="btn btn-success" onclick="confirmSubmit()" id="submitConfirmBtn">Submit</button>
     </div>
   </div>
 </div>
@@ -349,23 +349,23 @@
 <div id="createUserModal" class="modal-overlay hidden" onclick="closeModalOnBg(event,'createUserModal')">
   <div class="modal-box modal-box-sm">
     <div class="modal-header">
-      <h2>Create User</h2>
+      <h2 id="createUserModalTitle">Create User</h2>
       <button class="modal-close" onclick="closeModal('createUserModal')">×</button>
     </div>
     <div class="modal-body">
       <div class="form-group">
-        <label>Username <span class="required">*</span></label>
+        <label id="newUsernameLabel">Username <span class="required">*</span></label>
         <input type="text" id="newUsername" />
       </div>
       <div class="form-group">
-        <label>Password <span class="required">*</span></label>
+        <label id="newPasswordLabel">Password <span class="required">*</span></label>
         <input type="password" id="newPassword" />
       </div>
       <div id="createUserError" class="form-error hidden"></div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('createUserModal')">Cancel</button>
-      <button class="btn btn-primary" onclick="submitCreateUser()">Create</button>
+      <button class="btn btn-ghost" onclick="closeModal('createUserModal')" id="createUserCancelBtn">Cancel</button>
+      <button class="btn btn-primary" onclick="submitCreateUser()" id="createUserCreateBtn">Create</button>
     </div>
   </div>
 </div>

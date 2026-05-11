@@ -45,6 +45,14 @@ const I18N = {
     joined: 'Joined', edited: 'Edited', createNewJob: 'Create New Job', createNewUser: 'Create New User', editJob: 'Edit Job',
     justNow: 'Just now', mAgo: '{n}m ago', hAgo: '{n}h ago',
     postTime: 'Post Time', acceptTime: 'Accept Time', submitTime: 'Submit Time', lastEdited: 'Last Edited', by: 'By',
+    jobDetails: 'Job Details', title: 'Title', description: 'Description', timeLimit: 'Time Limit', noTimeLimit: 'No time limit',
+    specificDeadline: 'Specific deadline (date & time)', durationFromAcceptance: 'Duration from acceptance (hours)', 
+    beforeSpecificTime: 'Before a specific time (today)', timeRangeToday: 'Time range (today)',
+    assignToUsers: 'Assign to Users', attachFiles: 'Attach Files', clickToUploadFiles: 'Click to upload files',
+    cancel: 'Cancel', postJob: 'Post Job', markAsComplete: 'Mark as Complete', comments: 'Comments (optional)',
+    confirmComplete: 'Confirm Complete', submitJob: 'Submit Job', markJobSubmitted: 'Mark this job as submitted? You can optionally attach completion files.',
+    submissionFiles: 'Submission Files (optional)', createUser: 'Create User', username: 'Username', password: 'Password',
+    create: 'Create', close: 'Close', required: 'Required',
   },
   'zh-Hans': {
     appTitle: '工作平台', loginSubtitle: '登录后继续', loginUsername: '用户名', loginPassword: '密码', signIn: '登录', signingIn: '登录中…',
@@ -63,6 +71,14 @@ const I18N = {
     joined: '加入于', edited: '编辑于', createNewJob: '创建新任务', createNewUser: '创建新用户', editJob: '编辑任务',
     justNow: '刚刚', mAgo: '{n}分钟前', hAgo: '{n}小时前',
     postTime: '发布时间', acceptTime: '接受时间', submitTime: '提交时间', lastEdited: '最后编辑', by: '者',
+    jobDetails: '任务详情', title: '标题', description: '描述', timeLimit: '时间限制', noTimeLimit: '无时间限制',
+    specificDeadline: '指定截止日期(日期和时间)', durationFromAcceptance: '从接受后计算小时数',
+    beforeSpecificTime: '在特定时间前(今天)', timeRangeToday: '今天的时间范围',
+    assignToUsers: '分配给用户', attachFiles: '附加文件', clickToUploadFiles: '点击上传文件',
+    cancel: '取消', postJob: '发布任务', markAsComplete: '标记为完成', comments: '评论(可选)',
+    confirmComplete: '确认完成', submitJob: '提交任务', markJobSubmitted: '标记此任务已提交？您可以选择附加完成文件。',
+    submissionFiles: '提交文件(可选)', createUser: '创建用户', username: '用户名', password: '密码',
+    create: '创建', close: '关闭', required: '必需',
   },
   'zh-Hant': {
     appTitle: '工作平台', loginSubtitle: '登入後繼續', loginUsername: '用戶名稱', loginPassword: '密碼', signIn: '登入', signingIn: '登入中…',
@@ -81,6 +97,14 @@ const I18N = {
     joined: '加入於', edited: '編輯於', createNewJob: '建立新工作', createNewUser: '建立新用戶', editJob: '編輯工作',
     justNow: '剛剛', mAgo: '{n}分鐘前', hAgo: '{n}小時前',
     postTime: '發佈時間', acceptTime: '接受時間', submitTime: '提交時間', lastEdited: '最後編輯', by: '者',
+    jobDetails: '工作詳情', title: '標題', description: '描述', timeLimit: '時間限制', noTimeLimit: '無時間限制',
+    specificDeadline: '指定截止日期(日期和時間)', durationFromAcceptance: '從接受後計算小時數',
+    beforeSpecificTime: '在特定時間前(今天)', timeRangeToday: '今天的時間範圍',
+    assignToUsers: '分配給用戶', attachFiles: '附加文件', clickToUploadFiles: '點擊上傳文件',
+    cancel: '取消', postJob: '發佈工作', markAsComplete: '標記為完成', comments: '評論(可選)',
+    confirmComplete: '確認完成', submitJob: '提交工作', markJobSubmitted: '標記此工作已提交？您可以選擇附加完成文件。',
+    submissionFiles: '提交文件(可選)', createUser: '建立用戶', username: '用戶名稱', password: '密碼',
+    create: '建立', close: '關閉', required: '必填',
   },
 };
 
@@ -144,6 +168,39 @@ function applyStaticTranslations() {
   set('bottomJobsText', t('jobs'));
   set('bottomChatText', t('chat'));
   set('bottomUsersText', t('users'));
+  
+  // Modal translations
+  set('detailsModalTitle', t('jobDetails'));
+  set('detailsCloseBtn', t('close'));
+  set('completeModalTitle', t('markAsComplete'));
+  set('completeCommentsLabel', t('comments'));
+  set('completeCancelBtn', t('cancel'));
+  set('completeConfirmBtn', t('confirmComplete'));
+  set('submitModalTitle', t('submitJob'));
+  set('submitModalText', t('markJobSubmitted'));
+  set('submitCommentLabel', t('comments'));
+  set('submitFilesLabel', t('submissionFiles'));
+  set('submitUploadText', t('clickToUploadFiles'));
+  set('submitCancelBtn', t('cancel'));
+  set('submitConfirmBtn', t('submit'));
+  set('createUserModalTitle', t('createUser'));
+  set('newUsernameLabel', t('username'));
+  set('newPasswordLabel', t('password'));
+  set('createUserCancelBtn', t('cancel'));
+  set('createUserCreateBtn', t('create'));
+  set('jobTitleLabel', t('title'));
+  set('jobDescriptionLabel', t('description'));
+  set('jobTimeLimitLabel', t('timeLimit'));
+  set('noTimeLimitOption', t('noTimeLimit'));
+  set('specificDeadlineOption', t('specificDeadline'));
+  set('durationFromAcceptanceOption', t('durationFromAcceptance'));
+  set('beforeSpecificTimeOption', t('beforeSpecificTime'));
+  set('timeRangeTodayOption', t('timeRangeToday'));
+  set('assignToUsersLabel', t('assignToUsers'));
+  set('attachFilesLabel', t('attachFiles'));
+  set('clickUploadText', t('clickToUploadFiles'));
+  set('jobCancelBtn', t('cancel'));
+  
   const switcher = document.getElementById('languageSwitcher');
   if (switcher) switcher.value = state.language;
 }
