@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Job Platform</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+<!-- ═══════════════════ LOGIN PAGE ═══════════════════ -->
+<div id="loginPage" class="login-page">
+  <div class="login-card">
+    <div class="login-logo">
+      <svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="20" fill="#2563eb"/><path d="M12 27V17a2 2 0 012-2h12a2 2 0 012 2v10M16 15v-2a4 4 0 018 0v2" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+    </div>
+    <h1>Job Platform</h1>
+    <p class="login-subtitle">Sign in to continue</p>
+    <form id="loginForm" autocomplete="on">
+      <div class="form-group">
+        <label for="loginUsername">Username</label>
+        <input type="text" id="loginUsername" name="username" autocomplete="username" placeholder="Enter username" required />
+      </div>
+      <div class="form-group">
+        <label for="loginPassword">Password</label>
+        <input type="password" id="loginPassword" name="password" autocomplete="current-password" placeholder="Enter password" required />
+      </div>
+      <div id="loginError" class="form-error hidden"></div>
+      <button type="submit" class="btn btn-primary btn-full" id="loginBtn">Sign In</button>
+    </form>
+  </div>
+</div>
+
+<!-- ═══════════════════ MAIN APP ═══════════════════ -->
+<div id="app" class="app hidden">
+
+  <!-- Sidebar overlay (mobile) -->
+  <div id="sidebarOverlay" class="sidebar-overlay hidden" onclick="closeSidebar()"></div>
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#2563eb"/><path d="M9 22V13a2 2 0 012-2h10a2 2 0 012 2v9M13 11V9a3 3 0 016 0v2" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span>JobPlatform</span>
+      </div>
+      <button class="sidebar-close-btn" onclick="closeSidebar()">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="sidebarAvatar">A</div>
+      <div class="sidebar-user-info">
+        <span class="sidebar-username" id="sidebarUsername">admin</span>
+        <span class="sidebar-role" id="sidebarRole">Administrator</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button class="nav-item active" data-view="dashboard" onclick="switchView('dashboard')">
+        <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/><rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/><rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/><rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/></svg>
+        Dashboard
+      </button>
+      <button class="nav-item" data-view="chat" onclick="switchView('chat')">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+        Chat Room
+        <span class="nav-badge hidden" id="chatBadge">0</span>
+      </button>
+      <button class="nav-item admin-only hidden" data-view="users" onclick="switchView('users')">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        User Management
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="btn btn-logout" onclick="logout()">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main-content">
+
+    <!-- Top Header -->
+    <header class="top-header">
+      <button class="menu-toggle" onclick="toggleSidebar()">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <h1 class="view-title" id="viewTitle">Dashboard</h1>
+      <div class="header-right">
+        <div class="notif-wrapper" id="notifWrapper">
+          <button class="notif-btn" onclick="toggleNotifDropdown()">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="notif-badge hidden" id="notifBadge">0</span>
+          </button>
+          <div class="notif-dropdown hidden" id="notifDropdown">
+            <div class="notif-header">
+              <span>Notifications</span>
+              <button onclick="markAllNotifRead()">Mark all read</button>
+            </div>
+            <div class="notif-list" id="notifList">
+              <div class="notif-empty">No notifications</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ─── DASHBOARD VIEW ─── -->
+    <div id="dashboardView" class="view">
+      <div class="view-toolbar">
+        <div class="filter-tabs" id="filterTabs">
+          <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">All</button>
+          <button class="filter-btn" data-filter="pending" onclick="setFilter('pending')">Pending</button>
+          <button class="filter-btn" data-filter="accepted" onclick="setFilter('accepted')">Accepted</button>
+          <button class="filter-btn" data-filter="submitted" onclick="setFilter('submitted')">Submitted</button>
+          <button class="filter-btn" data-filter="complete" onclick="setFilter('complete')">Complete</button>
+        </div>
+        <button class="btn btn-primary admin-only hidden" id="createJobBtn" onclick="openCreateJob()">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          New Job
+        </button>
+      </div>
+      <div id="jobGrid" class="job-grid">
+        <div class="loading-state">Loading jobs…</div>
+      </div>
+    </div>
+
+    <!-- ─── CHAT VIEW ─── -->
+    <div id="chatView" class="view hidden">
+      <div class="chat-layout">
+        <div class="chat-sidebar">
+          <div class="chat-sidebar-header">Channels</div>
+          <div class="chat-channel active" data-job-id="" onclick="switchChannel(null, 'General Chat')">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" stroke-width="2"/></svg>
+            General Chat
+          </div>
+          <div class="chat-jobs-label">Job Channels</div>
+          <div id="chatJobList" class="chat-job-list"></div>
+        </div>
+        <div class="chat-main">
+          <div class="chat-header">
+            <span id="chatChannelName">General Chat</span>
+          </div>
+          <div class="chat-messages" id="chatMessages">
+            <div class="chat-loading">Loading messages…</div>
+          </div>
+          <div class="chat-input-area">
+            <div class="chat-ref-tag hidden" id="chatRefTag">
+              <span id="chatRefTagText"></span>
+              <button onclick="clearJobRef()">×</button>
+            </div>
+            <div class="chat-input-row">
+              <button class="chat-ref-btn" title="Refer a job" onclick="openJobRefPicker()">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M15 7h3a5 5 0 010 10h-3m-6 0H6A5 5 0 016 7h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="12" x2="16" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </button>
+              <input type="text" id="chatInput" class="chat-input" placeholder="Type a message…" onkeydown="handleChatKey(event)" />
+              <button class="btn btn-primary chat-send-btn" onclick="sendMessage()">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── USERS VIEW (admin only) ─── -->
+    <div id="usersView" class="view hidden">
+      <div class="view-toolbar">
+        <h2 style="font-size:1.1rem;font-weight:600;">User Accounts</h2>
+        <button class="btn btn-primary" onclick="openCreateUser()">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Add User
+        </button>
+      </div>
+      <div id="usersList" class="users-list">
+        <div class="loading-state">Loading users…</div>
+      </div>
+    </div>
+
+  </div><!-- /main-content -->
+
+  <!-- Mobile Bottom Nav -->
+  <nav class="bottom-nav" id="bottomNav">
+    <button class="bottom-nav-btn active" data-view="dashboard" onclick="switchView('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/><rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/><rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/><rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/></svg>
+      <span>Jobs</span>
+    </button>
+    <button class="bottom-nav-btn" data-view="chat" onclick="switchView('chat')">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" stroke-width="2"/></svg>
+      <span>Chat</span>
+      <span class="bottom-badge hidden" id="bottomChatBadge"></span>
+    </button>
+    <button class="bottom-nav-btn admin-only hidden" data-view="users" onclick="switchView('users')">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="2"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/></svg>
+      <span>Users</span>
+    </button>
+  </nav>
+
+</div><!-- /app -->
+
+<!-- ═══════════════════ MODALS ═══════════════════ -->
+
+<!-- Job Create/Edit Modal -->
+<div id="jobModal" class="modal-overlay hidden" onclick="closeModalOnBg(event,'jobModal')">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 id="jobModalTitle">Create New Job</h2>
+      <button class="modal-close" onclick="closeModal('jobModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <form id="jobForm" enctype="multipart/form-data">
+        <input type="hidden" id="jobFormId" />
+        <div class="form-group">
+          <label>Title <span class="required">*</span></label>
+          <input type="text" id="jobTitle" placeholder="e.g. Event Poster" required />
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="jobDescription" rows="4" placeholder="Describe the task…"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Time Limit</label>
+          <select id="timeLimitType" onchange="updateTimeLimitUI()">
+            <option value="none">No time limit</option>
+            <option value="fixed">Specific deadline (date & time)</option>
+            <option value="duration">Duration from acceptance (hours)</option>
+            <option value="before">Before a specific time (today)</option>
+            <option value="range">Time range (today)</option>
+          </select>
+        </div>
+        <div id="timeLimitInputs" class="time-limit-inputs hidden">
+          <!-- dynamic inputs -->
+        </div>
+        <div class="form-group">
+          <label>Assign to Users</label>
+          <div id="userCheckboxList" class="user-checkbox-list">Loading…</div>
+        </div>
+        <div class="form-group">
+          <label>Attach Files</label>
+          <div class="file-upload-area" id="fileUploadArea" onclick="document.getElementById('jobFilesInput').click()">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>Click to upload files</span>
+          </div>
+          <input type="file" id="jobFilesInput" multiple hidden onchange="handleFileSelect(event)" />
+          <div id="selectedFilesList" class="selected-files-list"></div>
+          <div id="existingFilesList" class="existing-files-list"></div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('jobModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitJobForm()" id="jobFormSubmitBtn">Post Job</button>
+    </div>
+  </div>
+</div>
+
+<!-- Details Modal -->
+<div id="detailsModal" class="modal-overlay hidden" onclick="closeModalOnBg(event,'detailsModal')">
+  <div class="modal-box modal-box-lg">
+    <div class="modal-header">
+      <h2>Job Details</h2>
+      <button class="modal-close" onclick="closeModal('detailsModal')">×</button>
+    </div>
+    <div class="modal-body" id="detailsModalBody">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('detailsModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Complete Modal -->
+<div id="completeModal" class="modal-overlay hidden" onclick="closeModalOnBg(event,'completeModal')">
+  <div class="modal-box modal-box-sm">
+    <div class="modal-header">
+      <h2>Mark as Complete</h2>
+      <button class="modal-close" onclick="closeModal('completeModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="completeJobId" />
+      <div class="form-group">
+        <label>Comments (optional)</label>
+        <textarea id="completeComments" rows="3" placeholder="e.g. Well Done! or You are late!"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('completeModal')">Cancel</button>
+      <button class="btn btn-success" onclick="confirmComplete()">Confirm Complete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Submit Job Modal (user) -->
+<div id="submitModal" class="modal-overlay hidden" onclick="closeModalOnBg(event,'submitModal')">
+  <div class="modal-box modal-box-sm">
+    <div class="modal-header">
+      <h2>Submit Job</h2>
+      <button class="modal-close" onclick="closeModal('submitModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="submitJobId" />
+      <p style="margin-bottom:1rem;color:#64748b;">Mark this job as submitted? You can optionally attach completion files.</p>
+      <div class="form-group">
+        <label>Submission Files (optional)</label>
+        <div class="file-upload-area" onclick="document.getElementById('submitFilesInput').click()">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Click to attach files</span>
+        </div>
+        <input type="file" id="submitFilesInput" multiple hidden onchange="handleSubmitFileSelect(event)" />
+        <div id="submitFilesList" class="selected-files-list"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('submitModal')">Cancel</button>
+      <button class="btn btn-success" onclick="confirmSubmit()">Submit</button>
+    </div>
+  </div>
+</div>
+
+<!-- Create User Modal -->
+<div id="createUserModal" class="modal-overlay hidden" onclick="closeModalOnBg(event,'createUserModal')">
+  <div class="modal-box modal-box-sm">
+    <div class="modal-header">
+      <h2>Create User</h2>
+      <button class="modal-close" onclick="closeModal('createUserModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Username <span class="required">*</span></label>
+        <input type="text" id="newUsername" placeholder="Enter username" />
+      </div>
+      <div class="form-group">
+        <label>Password <span class="required">*</span></label>
+        <input type="password" id="newPassword" placeholder="Enter password" />
+      </div>
+      <div id="createUserError" class="form-error hidden"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('createUserModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitCreateUser()">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- Image Preview Modal -->
+<div id="imagePreviewModal" class="modal-overlay hidden" onclick="closeModal('imagePreviewModal')">
+  <div class="image-preview-box" onclick="event.stopPropagation()">
+    <button class="modal-close image-preview-close" onclick="closeModal('imagePreviewModal')">×</button>
+    <img id="imagePreviewImg" src="" alt="Preview" />
+  </div>
+</div>
+
+<!-- Job Ref Picker Modal -->
+<div id="jobRefModal" class="modal-overlay hidden" onclick="closeModalOnBg(event,'jobRefModal')">
+  <div class="modal-box modal-box-sm">
+    <div class="modal-header">
+      <h2>Refer a Job</h2>
+      <button class="modal-close" onclick="closeModal('jobRefModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="jobRefList" class="job-ref-list">Loading…</div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toastContainer" class="toast-container"></div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/main.js"></script>
+</body>
+</html>

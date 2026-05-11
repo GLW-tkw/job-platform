@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: job-platform
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: DB_DIR
+        value: /var/data
+      - key: UPLOADS_DIR
+        value: /var/data/uploads
+    disk:
+      name: job-platform-data
+      mountPath: /var/data
+      sizeGB: 1
