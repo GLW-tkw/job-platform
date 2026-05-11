@@ -18,6 +18,17 @@ async function initDB() {
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
 
+      CREATE TABLE IF NOT EXISTS deleted_user_history (
+        id SERIAL PRIMARY KEY,
+        deleted_user_id INTEGER,
+        username TEXT NOT NULL,
+        role TEXT NOT NULL,
+        original_created_at TIMESTAMPTZ,
+        deleted_at TIMESTAMPTZ DEFAULT NOW(),
+        deleted_by_admin_id INTEGER,
+        deleted_by_admin_username TEXT
+      );
+
       CREATE TABLE IF NOT EXISTS jobs (
         id SERIAL PRIMARY KEY,
         title TEXT NOT NULL,

@@ -19,6 +19,7 @@ const state = {
     refJobTitle: null,
     unreadGeneral: 0,
   },
+  deletedUserHistory: [],
   editingJobFiles: [],       // files to remove on edit
   newSelectedFiles: [],      // newly selected files for job form
   submitFiles: [],           // files selected for job submission
@@ -842,14 +843,21 @@ function clearJobRef() {
 // ── USERS ──────────────────────────────────────────────────────────────
 async function loadUsers() {
   const list = document.getElementById('usersList');
+  const historyList = document.getElementById('deletedUsersHistoryList');
   list.innerHTML = '<div class="loading-state">Loading…</div>';
+  historyList.innerHTML = '<div class="loading-state">Loading…</div>';
   try {
-    state.users = await GET('/api/users');
+    const [users, history] = await Promise.all([
+      GET('/api/users'),
+      GET('/api/users/deleted-history'),
+    ]);
+    state.users = users;
+    state.deletedUserHistory = history;
+
     if (!state.users.length) {
-      list.innerHTML = '<div class="loading-state">No users yet. Create one!</div>';
-      return;
-    }
-    list.innerHTML = state.users.map(u => `
+      list.innerHTML = '<div class="loading-state">No active users yet.</div>';
+    } else {
+      list.innerHTML = state.users.map(u => `
       <div class="user-card">
         <div class="user-card-avatar">${u.username[0].toUpperCase()}</div>
         <div class="user-card-info">
@@ -860,8 +868,27 @@ async function loadUsers() {
           <button class="btn btn-sm btn-danger" onclick="deleteUser(${u.id}, '${esc(u.username)}')">Delete</button>
         </div>
       </div>`).join('');
+    }
+
+    if (!state.deletedUserHistory.length) {
+      historyList.innerHTML = '<div class="loading-state">No deleted account history.</div>';
+    } else {
+      historyList.innerHTML = state.deletedUserHistory.map(h => `
+        <div class="user-card">
+          <div class="user-card-avatar" style="background:#64748b;">${(h.username || '?')[0].toUpperCase()}</div>
+          <div class="user-card-info">
+            <div class="user-card-name">${esc(h.username)}</div>
+            <div class="user-card-joined">Deleted ${formatDateTime(h.deleted_at)} by ${esc(h.deleted_by_admin_username || 'admin')}</div>
+          </div>
+          <div class="user-card-actions">
+            <button class="btn btn-sm btn-danger" onclick="deleteHistoryRecord(${h.id}, '${esc(h.username)}')">Delete History</button>
+          </div>
+        </div>
+      `).join('');
+    }
   } catch (err) {
     list.innerHTML = `<div class="loading-state">Error: ${esc(err.message)}</div>`;
+    historyList.innerHTML = `<div class="loading-state">Error: ${esc(err.message)}</div>`;
   }
 }
 
@@ -894,6 +921,17 @@ async function deleteUser(id, name) {
   try {
     await DEL(`/api/users/${id}`);
     showToast(`User "${name}" deleted`, 'success');
+    loadUsers();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+async function deleteHistoryRecord(historyId, username) {
+  if (!confirm(`Delete history for "${username}"? This only removes the history record.`)) return;
+  try {
+    await DEL(`/api/users/deleted-history/${historyId}`);
+    showToast(`Deleted history for "${username}"`, 'success');
     loadUsers();
   } catch (err) {
     showToast(err.message, 'error');

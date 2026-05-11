@@ -95,6 +95,18 @@ app.get('/api/users', requireAdmin, async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+app.get('/api/users/deleted-history', requireAdmin, async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT id, deleted_user_id, username, role, original_created_at, deleted_at,
+              deleted_by_admin_id, deleted_by_admin_username
+       FROM deleted_user_history
+       ORDER BY deleted_at DESC`
+    );
+    res.json(rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 app.post('/api/users', requireAdmin, async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) return res.status(400).json({ error: 'Missing fields' });
@@ -112,8 +124,48 @@ app.post('/api/users', requireAdmin, async (req, res) => {
 });
 
 app.delete('/api/users/:id', requireAdmin, async (req, res) => {
+  const client = await pool.connect();
   try {
-    await pool.query("DELETE FROM users WHERE id = $1 AND role = 'user'", [req.params.id]);
+    await client.query('BEGIN');
+    const userResult = await client.query(
+      "SELECT id, username, role, created_at FROM users WHERE id = $1 AND role = 'user'",
+      [req.params.id]
+    );
+    const targetUser = userResult.rows[0];
+    if (!targetUser) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    await client.query(
+      `INSERT INTO deleted_user_history
+       (deleted_user_id, username, role, original_created_at, deleted_at, deleted_by_admin_id, deleted_by_admin_username)
+       VALUES ($1, $2, $3, $4, NOW(), $5, $6)`,
+      [
+        targetUser.id,
+        targetUser.username,
+        targetUser.role,
+        targetUser.created_at,
+        req.session.userId,
+        req.session.username,
+      ]
+    );
+
+    await client.query("DELETE FROM users WHERE id = $1 AND role = 'user'", [req.params.id]);
+    await client.query('COMMIT');
+    res.json({ success: true });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    res.status(500).json({ error: err.message });
+  } finally {
+    client.release();
+  }
+});
+
+app.delete('/api/users/deleted-history/:historyId', requireAdmin, async (req, res) => {
+  try {
+    const result = await pool.query('DELETE FROM deleted_user_history WHERE id = $1', [req.params.historyId]);
+    if (result.rowCount === 0) return res.status(404).json({ error: 'History record not found' });
     res.json({ success: true });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
