@@ -123,6 +123,9 @@
           <button class="filter-btn" data-filter="accepted" onclick="setFilter('accepted')" id="filterAcceptedText">Accepted</button>
           <button class="filter-btn" data-filter="submitted" onclick="setFilter('submitted')" id="filterSubmittedText">Submitted</button>
           <button class="filter-btn" data-filter="complete" onclick="setFilter('complete')" id="filterCompleteText">Complete</button>
+          <button class="btn btn-sm" id="hideCompleteBtn" onclick="toggleHideComplete()">
+            <span id="hideCompleteText">Hide Complete</span>
+          </button>
         </div>
         <button class="btn btn-primary admin-only hidden" id="createJobBtn" onclick="openCreateJob()">
           <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
@@ -189,6 +192,12 @@
       </div>
       <div id="deletedUsersHistoryList" class="users-list">
         <div class="loading-state">Loading deleted history…</div>
+      </div>
+      <div class="view-toolbar" style="margin-top:1.5rem;">
+        <h2 style="font-size:1.1rem;font-weight:600;" id="deletedPostHistoryText">Deleted Posts History</h2>
+      </div>
+      <div id="deletedJobsHistoryList" class="users-list">
+        <div class="loading-state">Loading deleted posts history…</div>
       </div>
     </div>
 

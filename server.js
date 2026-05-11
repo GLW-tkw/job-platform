@@ -309,11 +309,60 @@ app.put('/api/jobs/:id', requireAdmin, upload.array('files'), async (req, res) =
 });
 
 app.delete('/api/jobs/:id', requireAdmin, async (req, res) => {
+  const client = await pool.connect();
   try {
-    const files = (await pool.query('SELECT file_path FROM job_files WHERE job_id = $1', [req.params.id])).rows;
+    await client.query('BEGIN');
+    const jobResult = await client.query(
+      'SELECT id, title, description, status, created_at FROM jobs WHERE id = $1',
+      [req.params.id]
+    );
+    const job = jobResult.rows[0];
+    if (!job) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ error: 'Job not found' });
+    }
+
+    // Record deletion to history
+    await client.query(
+      `INSERT INTO deleted_jobs_history
+       (deleted_job_id, title, description, status, original_created_at, deleted_at, deleted_by_admin_id, deleted_by_admin_username)
+       VALUES ($1, $2, $3, $4, $5, NOW(), $6, $7)`,
+      [job.id, job.title, job.description, job.status, job.created_at, req.session.userId, req.session.username]
+    );
+
+    // Delete files
+    const files = (await client.query('SELECT file_path FROM job_files WHERE job_id = $1', [req.params.id])).rows;
     for (const f of files) { if (fs.existsSync(f.file_path)) fs.unlinkSync(f.file_path); }
-    await pool.query('DELETE FROM jobs WHERE id = $1', [req.params.id]);
+
+    // Delete job
+    await client.query('DELETE FROM jobs WHERE id = $1', [req.params.id]);
+    await client.query('COMMIT');
     io.emit('job_deleted', { id: parseInt(req.params.id) });
+    res.json({ success: true });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    res.status(500).json({ error: err.message });
+  } finally {
+    client.release();
+  }
+});
+
+app.get('/api/jobs/deleted-history', requireAdmin, async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT id, deleted_job_id, title, description, status, original_created_at, deleted_at,
+              deleted_by_admin_id, deleted_by_admin_username
+       FROM deleted_jobs_history
+       ORDER BY deleted_at DESC`
+    );
+    res.json(rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.delete('/api/jobs/deleted-history/:historyId', requireAdmin, async (req, res) => {
+  try {
+    const result = await pool.query('DELETE FROM deleted_jobs_history WHERE id = $1', [req.params.historyId]);
+    if (result.rowCount === 0) return res.status(404).json({ error: 'History record not found' });
     res.json({ success: true });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });

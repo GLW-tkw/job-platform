@@ -10,6 +10,7 @@ const state = {
   notifications: [],
   currentView: 'dashboard',
   currentFilter: 'all',
+  hideComplete: false,
   socket: null,
   chat: {
     currentJobId: null,
@@ -20,6 +21,7 @@ const state = {
     unreadGeneral: 0,
   },
   deletedUserHistory: [],
+  deletedJobsHistory: [],
   editingJobFiles: [],       // files to remove on edit
   newSelectedFiles: [],      // newly selected files for job form
   submitFiles: [],           // files selected for job submission
@@ -30,14 +32,15 @@ const I18N = {
     loginSubtitle: 'Sign in to continue', loginUsername: 'Username', loginPassword: 'Password', signIn: 'Sign In', signingIn: 'Signing in…',
     dashboard: 'Dashboard', chatRoom: 'Chat Room', userManagement: 'User Management', logout: 'Logout',
     notifications: 'Notifications', markAllRead: 'Mark all read', noNotifications: 'No notifications',
-    all: 'All', pending: 'Pending', accepted: 'Accepted', submitted: 'Submitted', complete: 'Complete', newJob: 'New Job',
+    all: 'All', pending: 'Pending', accepted: 'Accepted', submitted: 'Submitted', complete: 'Complete', newJob: 'New Job', hideComplete: 'Hide Complete',
     channels: 'Channels', generalChat: 'General Chat', jobChannels: 'Job Channels',
-    userAccounts: 'User Accounts', addUser: 'Add User', deletedHistory: 'Deleted Account History',
+    userAccounts: 'User Accounts', addUser: 'Add User', deletedHistory: 'Deleted Account History', deletedPostHistory: 'Deleted Posts History',
     jobs: 'Jobs', chat: 'Chat', users: 'Users', administrator: 'Administrator', user: 'User',
-    loading: 'Loading…', noActiveUsers: 'No active users yet.', noDeletedHistory: 'No deleted account history.',
+    loading: 'Loading…', noActiveUsers: 'No active users yet.', noDeletedHistory: 'No deleted account history.', noDeletedPostHistory: 'No deleted posts history.',
     delete: 'Delete', edit: 'Edit', details: 'Details', accept: 'Accept', submit: 'Submit', completeAction: 'Complete',
     deleteJobConfirm: 'Delete job "{title}"? This cannot be undone.', deleteUserConfirm: 'Delete user "{name}"? This cannot be undone.',
     deleteHistoryConfirm: 'Delete history for "{name}"? This only removes the history record.',
+    deletePostHistoryConfirm: 'Delete post history for "{title}"? This only removes the history record.',
     deletedBy: 'Deleted {time} by {admin}',
   },
   'zh-Hans': {
@@ -58,14 +61,15 @@ const I18N = {
     loginSubtitle: '登入後繼續', loginUsername: '用戶名稱', loginPassword: '密碼', signIn: '登入', signingIn: '登入中…',
     dashboard: '看板', chatRoom: '聊天室', userManagement: '用戶管理', logout: '登出',
     notifications: '通知', markAllRead: '全部標記為已讀', noNotifications: '沒有通知',
-    all: '全部', pending: '待處理', accepted: '已接受', submitted: '已提交', complete: '已完成', newJob: '新增工作',
+    all: '全部', pending: '待處理', accepted: '已接受', submitted: '已提交', complete: '已完成', newJob: '新增工作', hideComplete: '隱藏已完成',
     channels: '頻道', generalChat: '一般聊天', jobChannels: '工作頻道',
-    userAccounts: '用戶帳戶', addUser: '新增用戶', deletedHistory: '已刪除帳戶紀錄',
+    userAccounts: '用戶帳戶', addUser: '新增用戶', deletedHistory: '已刪除帳戶紀錄', deletedPostHistory: '已刪除工作紀錄',
     jobs: '工作', chat: '聊天', users: '用戶', administrator: '管理員', user: '用戶',
-    loading: '載入中…', noActiveUsers: '暫無有效用戶。', noDeletedHistory: '沒有刪除紀錄。',
+    loading: '載入中…', noActiveUsers: '暫無有效用戶。', noDeletedHistory: '沒有刪除紀錄。', noDeletedPostHistory: '沒有已刪除工作紀錄。',
     delete: '刪除', edit: '編輯', details: '詳情', accept: '接受', submit: '提交', completeAction: '完成',
     deleteJobConfirm: '確定刪除工作「{title}」？此操作無法還原。', deleteUserConfirm: '確定刪除用戶「{name}」？此操作無法還原。',
     deleteHistoryConfirm: '確定刪除「{name}」的歷史紀錄？只會刪除紀錄本身。',
+    deletePostHistoryConfirm: '確定刪除工作「{title}」的歷史紀錄？只會刪除紀錄本身。',
     deletedBy: '{time} 由 {admin} 刪除',
   },
 };
@@ -125,6 +129,8 @@ function applyStaticTranslations() {
   set('userAccountsText', t('userAccounts'));
   set('addUserText', t('addUser'));
   set('deletedHistoryText', t('deletedHistory'));
+  set('deletedPostHistoryText', t('deletedPostHistory'));
+  set('hideCompleteText', t('hideComplete'));
   set('bottomJobsText', t('jobs'));
   set('bottomChatText', t('chat'));
   set('bottomUsersText', t('users'));
@@ -298,7 +304,7 @@ function switchView(view) {
 
   if (view === 'dashboard') loadDashboard();
   else if (view === 'chat') { loadChat(); state.chat.unreadGeneral = 0; updateChatBadge(); }
-  else if (view === 'users') loadUsers();
+  else if (view === 'users') { loadUsers(); loadDeletedJobsHistory(); }
 }
 
 // ── SIDEBAR ────────────────────────────────────────────────────────────
@@ -330,6 +336,16 @@ function setFilter(filter) {
   renderJobGrid();
 }
 
+function toggleHideComplete() {
+  state.hideComplete = !state.hideComplete;
+  const hideBtn = document.getElementById('hideCompleteBtn');
+  if (hideBtn) {
+    hideBtn.classList.toggle('active', state.hideComplete);
+    hideBtn.textContent = state.hideComplete ? t('complete') : t('hideComplete');
+  }
+  renderJobGrid();
+}
+
 function renderJobGrid() {
   const grid = document.getElementById('jobGrid');
   let jobs = state.jobs;
@@ -338,6 +354,9 @@ function renderJobGrid() {
       if (state.currentFilter === 'complete') return j.status === 'complete';
       return j.status === state.currentFilter;
     });
+  }
+  if (state.hideComplete) {
+    jobs = jobs.filter(j => j.status !== 'complete');
   }
   if (!jobs.length) {
     grid.innerHTML = `
@@ -1005,6 +1024,34 @@ async function loadUsers() {
   }
 }
 
+async function loadDeletedJobsHistory() {
+  const historyList = document.getElementById('deletedJobsHistoryList');
+  if (!historyList) return;
+  historyList.innerHTML = `<div class="loading-state">${t('loading')}</div>`;
+  try {
+    const history = await GET('/api/jobs/deleted-history');
+    state.deletedJobsHistory = history;
+    if (!state.deletedJobsHistory.length) {
+      historyList.innerHTML = `<div class="loading-state">${t('noDeletedPostHistory')}</div>`;
+    } else {
+      historyList.innerHTML = state.deletedJobsHistory.map(h => `
+        <div class="user-card">
+          <div class="user-card-avatar" style="background:#64748b;">${(h.title || '?')[0].toUpperCase()}</div>
+          <div class="user-card-info">
+            <div class="user-card-name">${esc(h.title)}</div>
+            <div class="user-card-joined">${t('deletedBy', { time: formatDateTime(h.deleted_at), admin: esc(h.deleted_by_admin_username || 'admin') })}</div>
+          </div>
+          <div class="user-card-actions">
+            <button class="btn btn-sm btn-danger" onclick="deletePostHistoryRecord(${h.id}, '${esc(h.title)}')">${t('delete')}</button>
+          </div>
+        </div>
+      `).join('');
+    }
+  } catch (err) {
+    historyList.innerHTML = `<div class="loading-state">Error: ${esc(err.message)}</div>`;
+  }
+}
+
 function openCreateUser() {
   document.getElementById('newUsername').value = '';
   document.getElementById('newPassword').value = '';
@@ -1057,6 +1104,17 @@ async function deleteHistoryRecord(historyId, username) {
     await DEL(`/api/users/deleted-history/${historyId}`);
     showToast(`Deleted history for "${username}"`, 'success');
     loadUsers();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+async function deletePostHistoryRecord(historyId, title) {
+  if (!confirm(t('deletePostHistoryConfirm', { title }))) return;
+  try {
+    await DEL(`/api/jobs/deleted-history/${historyId}`);
+    showToast(`Deleted post history for "${title}"`, 'success');
+    loadDeletedJobsHistory();
   } catch (err) {
     showToast(err.message, 'error');
   }
