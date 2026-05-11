@@ -89,6 +89,7 @@ async function initDB() {
         user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         file_path TEXT DEFAULT '',
         file_name TEXT DEFAULT '',
+        comment TEXT DEFAULT '',
         submitted_at TIMESTAMPTZ NOT NULL
       );
 
@@ -108,6 +109,11 @@ async function initDB() {
         text TEXT NOT NULL,
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
+    `);
+
+    await client.query(`
+      ALTER TABLE job_submissions
+      ADD COLUMN IF NOT EXISTS comment TEXT DEFAULT ''
     `);
 
     const adminCheck = await client.query("SELECT id FROM users WHERE username = 'admin'");

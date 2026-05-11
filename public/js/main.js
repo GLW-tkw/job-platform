@@ -524,7 +524,8 @@ async function openDetails(jobId) {
         const fileCell = downloadHref
           ? `<a href="${downloadHref}" download="${esc(s.file_name)}" class="file-link">${esc(s.file_name)}</a>`
           : esc(s.file_name);
-        return `<div class="details-row"><span class="details-label">${esc(s.username||'')}</span><span class="details-value">${fileCell}</span></div>`;
+        const commentCell = s.comment ? `<div style="margin-top:.25rem;color:#64748b;white-space:pre-wrap;">Comment: ${esc(s.comment)}</div>` : '';
+        return `<div class="details-row"><span class="details-label">${esc(s.username||'')}</span><span class="details-value">${fileCell}${commentCell}</span></div>`;
       }).join('')}
     </div>` : ''}
     ${(job.acceptances||[]).length > 1 ? `
@@ -746,6 +747,7 @@ async function acceptJob(jobId) {
 
 function openSubmit(jobId) {
   document.getElementById('submitJobId').value = jobId;
+  document.getElementById('submitComment').value = '';
   document.getElementById('submitFilesList').innerHTML = '';
   state.submitFiles = [];
   openModal('submitModal');
@@ -763,6 +765,8 @@ function handleSubmitFileSelect(e) {
 async function confirmSubmit() {
   const jobId = document.getElementById('submitJobId').value;
   const fd = new FormData();
+  const submissionComment = document.getElementById('submitComment').value.trim();
+  fd.append('submission_comment', submissionComment);
   for (const f of state.submitFiles) fd.append('files', f);
   try {
     await api('POST', `/api/jobs/${jobId}/submit`, fd, true);

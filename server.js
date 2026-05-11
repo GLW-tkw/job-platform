@@ -177,7 +177,7 @@ async function buildJob(job) {
     pool.query('SELECT id, job_id, filename, original_name FROM job_files WHERE job_id = $1', [job.id]),
     pool.query('SELECT ja.user_id, u.username FROM job_assignments ja JOIN users u ON ja.user_id = u.id WHERE ja.job_id = $1', [job.id]),
     pool.query('SELECT ac.user_id, u.username, ac.accepted_at FROM job_acceptances ac JOIN users u ON ac.user_id = u.id WHERE ac.job_id = $1', [job.id]),
-    pool.query('SELECT s.user_id, u.username, s.submitted_at, s.file_name, s.file_path FROM job_submissions s JOIN users u ON s.user_id = u.id WHERE s.job_id = $1', [job.id]),
+    pool.query('SELECT s.user_id, u.username, s.submitted_at, s.file_name, s.file_path, s.comment FROM job_submissions s JOIN users u ON s.user_id = u.id WHERE s.job_id = $1', [job.id]),
   ]);
   const submissionRows = submissions.rows.map((s) => ({
     ...s,
@@ -389,6 +389,7 @@ app.post('/api/jobs/:id/accept', requireAuth, async (req, res) => {
 app.post('/api/jobs/:id/submit', requireAuth, upload.array('files'), async (req, res) => {
   if (req.session.role === 'admin') return res.status(403).json({ error: 'Admins cannot submit jobs' });
   try {
+    const submissionComment = (req.body.submission_comment || '').trim();
     const job = (await pool.query('SELECT * FROM jobs WHERE id = $1', [req.params.id])).rows[0];
     if (!job) return res.status(404).json({ error: 'Job not found' });
     const hasAccepted = (await pool.query('SELECT id FROM job_acceptances WHERE job_id = $1 AND user_id = $2', [req.params.id, req.session.userId])).rows[0];
@@ -399,14 +400,14 @@ app.post('/api/jobs/:id/submit', requireAuth, upload.array('files'), async (req,
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
         await pool.query(
-          'INSERT INTO job_submissions (job_id, user_id, file_path, file_name, submitted_at) VALUES ($1,$2,$3,$4,$5)',
-          [req.params.id, req.session.userId, file.path, file.originalname, now]
+          'INSERT INTO job_submissions (job_id, user_id, file_path, file_name, comment, submitted_at) VALUES ($1,$2,$3,$4,$5,$6)',
+          [req.params.id, req.session.userId, file.path, file.originalname, submissionComment, now]
         );
       }
     } else {
       await pool.query(
-        'INSERT INTO job_submissions (job_id, user_id, file_path, file_name, submitted_at) VALUES ($1,$2,$3,$4,$5)',
-        [req.params.id, req.session.userId, '', '', now]
+        'INSERT INTO job_submissions (job_id, user_id, file_path, file_name, comment, submitted_at) VALUES ($1,$2,$3,$4,$5,$6)',
+        [req.params.id, req.session.userId, '', '', submissionComment, now]
       );
     }
     await pool.query('UPDATE jobs SET status=$1, submit_time=$2 WHERE id=$3', ['submitted', now, req.params.id]);
