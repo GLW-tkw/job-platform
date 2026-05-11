@@ -119,9 +119,19 @@ async function buildJob(job) {
     pool.query('SELECT id, job_id, filename, original_name FROM job_files WHERE job_id = $1', [job.id]),
     pool.query('SELECT ja.user_id, u.username FROM job_assignments ja JOIN users u ON ja.user_id = u.id WHERE ja.job_id = $1', [job.id]),
     pool.query('SELECT ac.user_id, u.username, ac.accepted_at FROM job_acceptances ac JOIN users u ON ac.user_id = u.id WHERE ac.job_id = $1', [job.id]),
-    pool.query('SELECT s.user_id, u.username, s.submitted_at, s.file_name FROM job_submissions s JOIN users u ON s.user_id = u.id WHERE s.job_id = $1', [job.id]),
+    pool.query('SELECT s.user_id, u.username, s.submitted_at, s.file_name, s.file_path FROM job_submissions s JOIN users u ON s.user_id = u.id WHERE s.job_id = $1', [job.id]),
   ]);
-  return { ...job, files: files.rows, assignments: assignments.rows, acceptances: acceptances.rows, submissions: submissions.rows };
+  const submissionRows = submissions.rows.map((s) => ({
+    ...s,
+    stored_filename: s.file_path ? path.basename(s.file_path) : '',
+  }));
+  return {
+    ...job,
+    files: files.rows,
+    assignments: assignments.rows,
+    acceptances: acceptances.rows,
+    submissions: submissionRows,
+  };
 }
 
 // ── JOBS ───────────────────────────────────────────────────────────────

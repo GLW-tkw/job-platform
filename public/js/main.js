@@ -376,7 +376,13 @@ async function openDetails(jobId) {
     ${submFiles.length ? `
     <div class="details-section">
       <h3>Submission Files</h3>
-      ${submFiles.map(s => `<div class="details-row"><span class="details-label">${esc(s.username||'')}</span><span class="details-value">${esc(s.file_name)}</span></div>`).join('')}
+      ${submFiles.map(s => {
+        const downloadHref = s.stored_filename ? `/uploads/${encodeURIComponent(s.stored_filename)}` : '';
+        const fileCell = downloadHref
+          ? `<a href="${downloadHref}" download="${esc(s.file_name)}" class="file-link">${esc(s.file_name)}</a>`
+          : esc(s.file_name);
+        return `<div class="details-row"><span class="details-label">${esc(s.username||'')}</span><span class="details-value">${fileCell}</span></div>`;
+      }).join('')}
     </div>` : ''}
     ${(job.acceptances||[]).length > 1 ? `
     <div class="details-section">
