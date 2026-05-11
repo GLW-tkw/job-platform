@@ -42,6 +42,9 @@ const I18N = {
     deleteHistoryConfirm: 'Delete history for "{name}"? This only removes the history record.',
     deletePostHistoryConfirm: 'Delete post history for "{title}"? This only removes the history record.',
     deletedBy: 'Deleted {time} by {admin}',
+    joined: 'Joined', edited: 'Edited', createNewJob: 'Create New Job', createNewUser: 'Create New User', editJob: 'Edit Job',
+    justNow: 'Just now', mAgo: '{n}m ago', hAgo: '{n}h ago',
+    postTime: 'Post Time', acceptTime: 'Accept Time', submitTime: 'Submit Time', lastEdited: 'Last Edited', by: 'By',
   },
   'zh-Hans': {
     loginSubtitle: '登录后继续', loginUsername: '用户名', loginPassword: '密码', signIn: '登录', signingIn: '登录中…',
@@ -56,6 +59,10 @@ const I18N = {
     deleteJobConfirm: '确定删除任务“{title}”？此操作不可恢复。', deleteUserConfirm: '确定删除用户“{name}”？此操作不可恢复。',
     deleteHistoryConfirm: '确定删除“{name}”的历史记录？仅删除记录本身。',
     deletedBy: '{time} 由 {admin} 删除',
+    deletePostHistoryConfirm: '确定删除任务"{title}"的历史记录？仅删除记录本身。',
+    joined: '加入于', edited: '编辑于', createNewJob: '创建新任务', createNewUser: '创建新用户', editJob: '编辑任务',
+    justNow: '刚刚', mAgo: '{n}分钟前', hAgo: '{n}小时前',
+    postTime: '发布时间', acceptTime: '接受时间', submitTime: '提交时间', lastEdited: '最后编辑', by: '者',
   },
   'zh-Hant': {
     loginSubtitle: '登入後繼續', loginUsername: '用戶名稱', loginPassword: '密碼', signIn: '登入', signingIn: '登入中…',
@@ -71,6 +78,9 @@ const I18N = {
     deleteHistoryConfirm: '確定刪除「{name}」的歷史紀錄？只會刪除紀錄本身。',
     deletePostHistoryConfirm: '確定刪除工作「{title}」的歷史紀錄？只會刪除紀錄本身。',
     deletedBy: '{time} 由 {admin} 刪除',
+    joined: '加入於', edited: '編輯於', createNewJob: '建立新工作', createNewUser: '建立新用戶', editJob: '編輯工作',
+    justNow: '剛剛', mAgo: '{n}分鐘前', hAgo: '{n}小時前',
+    postTime: '發佈時間', acceptTime: '接受時間', submitTime: '提交時間', lastEdited: '最後編輯', by: '者',
   },
 };
 
@@ -378,7 +388,7 @@ function renderJobCard(job) {
 
   const { label: statusLabel, cls: statusCls } = getStatusInfo(job);
   const deadlineText  = getDeadlineText(job);
-  const editedBadge   = job.edited ? `<span class="badge badge-edited">Edited ${formatTime(job.edited_at)}</span>` : '';
+  const editedBadge   = job.edited ? `<span class="badge badge-edited">${t('edited')} ${formatTime(job.edited_at)}</span>` : '';
 
   // Files display
   const filesHtml = (job.files && job.files.length)
@@ -494,17 +504,17 @@ async function openDetails(jobId) {
     </div>
     ${(job.files||[]).length ? `
     <div class="details-section">
-      <h3>Attached Files</h3>
+      <h3>${t('jobs')}</h3>
       ${job.files.map(f => renderFileItem(f)).join('')}
     </div>` : ''}
     <div class="details-section">
-      <h3>Timeline</h3>
-      <div class="details-row"><span class="details-label">Post Time</span><span class="details-value">${formatDateTime(job.created_at)}</span></div>
-      <div class="details-row"><span class="details-label">Accept Time</span><span class="details-value">${firstAccept ? formatDateTime(firstAccept.accepted_at) + (firstAccept.username ? ' — ' + esc(firstAccept.username) : '') : '—'}</span></div>
-      <div class="details-row"><span class="details-label">Submit Time</span><span class="details-value">${firstSubmit ? formatDateTime(firstSubmit.submitted_at) + (firstSubmit.username ? ' — ' + esc(firstSubmit.username) : '') : '—'}</span></div>
-      <div class="details-row"><span class="details-label">Status</span><span class="details-value"><span class="badge badge-${statusCls}">${esc(statusLabel)}</span></span></div>
+      <h3>${'Timeline'}</h3>
+      <div class="details-row"><span class="details-label">${t('postTime')}</span><span class="details-value">${formatDateTime(job.created_at)}</span></div>
+      <div class="details-row"><span class="details-label">${t('acceptTime')}</span><span class="details-value">${firstAccept ? formatDateTime(firstAccept.accepted_at) + (firstAccept.username ? ' — ' + esc(firstAccept.username) : '') : '—'}</span></div>
+      <div class="details-row"><span class="details-label">${t('submitTime')}</span><span class="details-value">${firstSubmit ? formatDateTime(firstSubmit.submitted_at) + (firstSubmit.username ? ' — ' + esc(firstSubmit.username) : '') : '—'}</span></div>
+      <div class="details-row"><span class="details-label">${t('complete')}</span><span class="details-value"><span class="badge badge-${statusCls}">${esc(statusLabel)}</span></span></div>
       ${job.comments ? `<div class="details-row"><span class="details-label">Comments</span><span class="details-value">${esc(job.comments)}</span></div>` : ''}
-      ${job.edited ? `<div class="details-row"><span class="details-label">Last Edited</span><span class="details-value">${formatDateTime(job.edited_at)}</span></div>` : ''}
+      ${job.edited ? `<div class="details-row"><span class="details-label">${t('lastEdited')}</span><span class="details-value">${formatDateTime(job.edited_at)}</span></div>` : ''}
     </div>
     ${submFiles.length ? `
     <div class="details-section">
@@ -534,8 +544,8 @@ async function openCreateJob() {
   document.getElementById('jobTitle').value = '';
   document.getElementById('jobDescription').value = '';
   document.getElementById('timeLimitType').value = 'none';
-  document.getElementById('jobModalTitle').textContent = 'Create New Job';
-  document.getElementById('jobFormSubmitBtn').textContent = 'Post Job';
+  document.getElementById('jobModalTitle').textContent = t('createNewJob');
+  document.getElementById('jobFormSubmitBtn').textContent = t('newJob');
   document.getElementById('selectedFilesList').innerHTML = '';
   document.getElementById('existingFilesList').innerHTML = '';
   updateTimeLimitUI();
@@ -551,8 +561,8 @@ async function openEditJob(jobId) {
   document.getElementById('jobTitle').value = job.title;
   document.getElementById('jobDescription').value = job.description || '';
   document.getElementById('timeLimitType').value = job.time_limit_type || 'none';
-  document.getElementById('jobModalTitle').textContent = 'Edit Job';
-  document.getElementById('jobFormSubmitBtn').textContent = 'Save Changes';
+  document.getElementById('jobModalTitle').textContent = t('editJob');
+  document.getElementById('jobFormSubmitBtn').textContent = t('edit');
   document.getElementById('selectedFilesList').innerHTML = '';
   updateTimeLimitUI(job);
 
@@ -994,7 +1004,7 @@ async function loadUsers() {
         <div class="user-card-avatar">${u.username[0].toUpperCase()}</div>
         <div class="user-card-info">
           <div class="user-card-name">${esc(u.username)}</div>
-          <div class="user-card-joined">Joined ${formatDate(u.created_at)}</div>
+          <div class="user-card-joined">${t('joined')} ${formatDate(u.created_at)}</div>
         </div>
         <div class="user-card-actions">
           <button class="btn btn-sm btn-danger" onclick="deleteUser(${u.id}, '${esc(u.username)}')">${t('delete')}</button>
@@ -1199,7 +1209,7 @@ function getEffectiveDeadline(job) {
 function getDeadlineText(job) {
   switch (job.time_limit_type) {
     case 'fixed':
-      return job.deadline ? 'By ' + formatDateTime(job.deadline) : null;
+      return job.deadline ? t('by') + ' ' + formatDateTime(job.deadline) : null;
     case 'duration':
       return job.time_limit_value ? `Within ${job.time_limit_value} hour(s) of acceptance` : null;
     case 'before':
@@ -1213,25 +1223,31 @@ function getDeadlineText(job) {
 
 function formatDate(iso) {
   if (!iso) return '—';
-  return new Date(iso).toLocaleDateString('en-HK', { year: 'numeric', month: 'short', day: 'numeric' });
+  const lang = state.language || 'en';
+  const locale = lang === 'zh-Hans' ? 'zh-CN' : lang === 'zh-Hant' ? 'zh-HK' : 'en-US';
+  return new Date(iso).toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
 function formatDateTime(iso) {
   if (!iso) return '—';
-  return new Date(iso).toLocaleString('en-HK', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  const lang = state.language || 'en';
+  const locale = lang === 'zh-Hans' ? 'zh-CN' : lang === 'zh-Hant' ? 'zh-HK' : 'en-US';
+  return new Date(iso).toLocaleString(locale, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
 function formatTime(iso) {
   if (!iso) return '';
-  return new Date(iso).toLocaleTimeString('en-HK', { hour: '2-digit', minute: '2-digit' });
+  const lang = state.language || 'en';
+  const locale = lang === 'zh-Hans' ? 'zh-CN' : lang === 'zh-Hant' ? 'zh-HK' : 'en-US';
+  return new Date(iso).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
 }
 
 function formatRelativeTime(iso) {
   if (!iso) return '';
   const diff = Date.now() - new Date(iso).getTime();
-  if (diff < 60000) return 'Just now';
-  if (diff < 3600000) return `${Math.floor(diff/60000)}m ago`;
-  if (diff < 86400000) return `${Math.floor(diff/3600000)}h ago`;
+  if (diff < 60000) return t('justNow');
+  if (diff < 3600000) return t('mAgo', { n: Math.floor(diff/60000) });
+  if (diff < 86400000) return t('hAgo', { n: Math.floor(diff/3600000) });
   return formatDate(iso);
 }
 
