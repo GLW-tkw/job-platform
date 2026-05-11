@@ -282,6 +282,16 @@ img { max-width: 100%; display: block; }
 .view-title { font-size: 1.1rem; font-weight: 700; flex: 1; }
 .header-right { display: flex; align-items: center; gap: .75rem; }
 
+.lang-select {
+  height: 36px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-secondary);
+  padding: 0 .6rem;
+  font-size: .82rem;
+}
+
 /* Notifications */
 .notif-wrapper { position: relative; }
 .notif-btn {

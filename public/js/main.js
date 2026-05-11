@@ -25,6 +25,113 @@ const state = {
   submitFiles: [],           // files selected for job submission
 };
 
+const I18N = {
+  en: {
+    loginSubtitle: 'Sign in to continue', loginUsername: 'Username', loginPassword: 'Password', signIn: 'Sign In', signingIn: 'Signing in…',
+    dashboard: 'Dashboard', chatRoom: 'Chat Room', userManagement: 'User Management', logout: 'Logout',
+    notifications: 'Notifications', markAllRead: 'Mark all read', noNotifications: 'No notifications',
+    all: 'All', pending: 'Pending', accepted: 'Accepted', submitted: 'Submitted', complete: 'Complete', newJob: 'New Job',
+    channels: 'Channels', generalChat: 'General Chat', jobChannels: 'Job Channels',
+    userAccounts: 'User Accounts', addUser: 'Add User', deletedHistory: 'Deleted Account History',
+    jobs: 'Jobs', chat: 'Chat', users: 'Users', administrator: 'Administrator', user: 'User',
+    loading: 'Loading…', noActiveUsers: 'No active users yet.', noDeletedHistory: 'No deleted account history.',
+    delete: 'Delete', edit: 'Edit', details: 'Details', accept: 'Accept', submit: 'Submit', completeAction: 'Complete',
+    deleteJobConfirm: 'Delete job "{title}"? This cannot be undone.', deleteUserConfirm: 'Delete user "{name}"? This cannot be undone.',
+    deleteHistoryConfirm: 'Delete history for "{name}"? This only removes the history record.',
+    deletedBy: 'Deleted {time} by {admin}',
+  },
+  'zh-Hans': {
+    loginSubtitle: '登录后继续', loginUsername: '用户名', loginPassword: '密码', signIn: '登录', signingIn: '登录中…',
+    dashboard: '看板', chatRoom: '聊天室', userManagement: '用户管理', logout: '退出登录',
+    notifications: '通知', markAllRead: '全部标记已读', noNotifications: '暂无通知',
+    all: '全部', pending: '待处理', accepted: '已接受', submitted: '已提交', complete: '已完成', newJob: '新建任务',
+    channels: '频道', generalChat: '公共聊天', jobChannels: '任务频道',
+    userAccounts: '用户账号', addUser: '新增用户', deletedHistory: '已删除账号记录',
+    jobs: '任务', chat: '聊天', users: '用户', administrator: '管理员', user: '用户',
+    loading: '加载中…', noActiveUsers: '暂无有效用户。', noDeletedHistory: '暂无删除记录。',
+    delete: '删除', edit: '编辑', details: '详情', accept: '接受', submit: '提交', completeAction: '完成',
+    deleteJobConfirm: '确定删除任务“{title}”？此操作不可恢复。', deleteUserConfirm: '确定删除用户“{name}”？此操作不可恢复。',
+    deleteHistoryConfirm: '确定删除“{name}”的历史记录？仅删除记录本身。',
+    deletedBy: '{time} 由 {admin} 删除',
+  },
+  'zh-Hant': {
+    loginSubtitle: '登入後繼續', loginUsername: '用戶名稱', loginPassword: '密碼', signIn: '登入', signingIn: '登入中…',
+    dashboard: '看板', chatRoom: '聊天室', userManagement: '用戶管理', logout: '登出',
+    notifications: '通知', markAllRead: '全部標記為已讀', noNotifications: '沒有通知',
+    all: '全部', pending: '待處理', accepted: '已接受', submitted: '已提交', complete: '已完成', newJob: '新增工作',
+    channels: '頻道', generalChat: '一般聊天', jobChannels: '工作頻道',
+    userAccounts: '用戶帳戶', addUser: '新增用戶', deletedHistory: '已刪除帳戶紀錄',
+    jobs: '工作', chat: '聊天', users: '用戶', administrator: '管理員', user: '用戶',
+    loading: '載入中…', noActiveUsers: '暫無有效用戶。', noDeletedHistory: '沒有刪除紀錄。',
+    delete: '刪除', edit: '編輯', details: '詳情', accept: '接受', submit: '提交', completeAction: '完成',
+    deleteJobConfirm: '確定刪除工作「{title}」？此操作無法還原。', deleteUserConfirm: '確定刪除用戶「{name}」？此操作無法還原。',
+    deleteHistoryConfirm: '確定刪除「{name}」的歷史紀錄？只會刪除紀錄本身。',
+    deletedBy: '{time} 由 {admin} 刪除',
+  },
+};
+
+function t(key, vars = {}) {
+  const lang = state.language || 'en';
+  let text = (I18N[lang] && I18N[lang][key]) || I18N.en[key] || key;
+  Object.keys(vars).forEach((k) => {
+    text = text.replace(`{${k}}`, vars[k]);
+  });
+  return text;
+}
+
+function setLanguage(lang) {
+  state.language = I18N[lang] ? lang : 'en';
+  localStorage.setItem('jobplatform_lang', state.language);
+  applyStaticTranslations();
+  if (state.user) {
+    switchView(state.currentView || 'dashboard');
+  }
+}
+
+function applyStaticTranslations() {
+  const set = (id, txt) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = txt;
+  };
+  set('loginSubtitle', t('loginSubtitle'));
+  set('loginUsernameLabel', t('loginUsername'));
+  set('loginPasswordLabel', t('loginPassword'));
+  const userInput = document.getElementById('loginUsername');
+  const passInput = document.getElementById('loginPassword');
+  if (userInput) userInput.placeholder = t('loginUsername');
+  if (passInput) passInput.placeholder = t('loginPassword');
+  if (document.getElementById('loginBtn') && !document.getElementById('loginBtn').disabled) {
+    set('loginBtn', t('signIn'));
+  }
+  set('navDashboardText', t('dashboard'));
+  set('navChatText', t('chatRoom'));
+  set('navUsersText', t('userManagement'));
+  set('logoutText', t('logout'));
+  set('notifHeaderTitle', t('notifications'));
+  set('markAllReadText', t('markAllRead'));
+  set('notifEmptyText', t('noNotifications'));
+  set('filterAllText', t('all'));
+  set('filterPendingText', t('pending'));
+  set('filterAcceptedText', t('accepted'));
+  set('filterSubmittedText', t('submitted'));
+  set('filterCompleteText', t('complete'));
+  set('newJobText', t('newJob'));
+  set('chatChannelsText', t('channels'));
+  set('generalChatText', t('generalChat'));
+  set('chatJobChannelsText', t('jobChannels'));
+  if (state.chat && state.chat.currentJobId === null) {
+    set('chatChannelName', t('generalChat'));
+  }
+  set('userAccountsText', t('userAccounts'));
+  set('addUserText', t('addUser'));
+  set('deletedHistoryText', t('deletedHistory'));
+  set('bottomJobsText', t('jobs'));
+  set('bottomChatText', t('chat'));
+  set('bottomUsersText', t('users'));
+  const switcher = document.getElementById('languageSwitcher');
+  if (switcher) switcher.value = state.language;
+}
+
 // ── API HELPERS ────────────────────────────────────────────────────────
 async function api(method, url, body, isForm) {
   const opts = { method, credentials: 'same-origin' };
@@ -48,6 +155,8 @@ const DEL  = (url)         => api('DELETE', url);
 
 // ── INIT ───────────────────────────────────────────────────────────────
 async function init() {
+  state.language = localStorage.getItem('jobplatform_lang') || 'en';
+  applyStaticTranslations();
   try {
     const me = await GET('/api/auth/me');
     onLoginSuccess(me);
@@ -74,7 +183,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   const errEl = document.getElementById('loginError');
   const btn   = document.getElementById('loginBtn');
   errEl.classList.add('hidden');
-  btn.disabled = true; btn.textContent = 'Signing in…';
+  btn.disabled = true; btn.textContent = t('signingIn');
   try {
     const user = await POST('/api/auth/login', { username, password });
     onLoginSuccess(user);
@@ -82,7 +191,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     errEl.textContent = err.message;
     errEl.classList.remove('hidden');
   } finally {
-    btn.disabled = false; btn.textContent = 'Sign In';
+    btn.disabled = false; btn.textContent = t('signIn');
   }
 });
 
@@ -100,7 +209,7 @@ function onLoginSuccess(user) {
 
 function setUserUI(user) {
   document.getElementById('sidebarUsername').textContent = user.username;
-  document.getElementById('sidebarRole').textContent = user.role === 'admin' ? 'Administrator' : 'User';
+  document.getElementById('sidebarRole').textContent = user.role === 'admin' ? t('administrator') : t('user');
   document.getElementById('sidebarAvatar').textContent = user.username[0].toUpperCase();
 }
 
@@ -181,7 +290,7 @@ function switchView(view) {
     n.classList.toggle('active', n.dataset.view === view);
   });
 
-  const titles = { dashboard: 'Dashboard', chat: 'Chat Room', users: 'User Management' };
+  const titles = { dashboard: t('dashboard'), chat: t('chatRoom'), users: t('userManagement') };
   document.getElementById('viewTitle').textContent = titles[view] || view;
 
   // Close sidebar on mobile
@@ -234,7 +343,7 @@ function renderJobGrid() {
     grid.innerHTML = `
       <div class="empty-state">
         <svg viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5V3h6v2M9 5h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <p>No jobs found</p>
+        <p>${t('jobs')} 0</p>
       </div>`;
     return;
   }
@@ -280,32 +389,36 @@ function renderJobCard(job) {
     if (job.status !== 'complete') {
       rightActions += `<button class="btn btn-sm btn-warning" onclick="openEditJob(${job.id})">
         <svg viewBox="0 0 24 24" fill="none"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Edit
+        ${t('edit')}
       </button>`;
     }
     if (job.status === 'accepted' || job.status === 'submitted') {
       rightActions += `<button class="btn btn-sm btn-success" onclick="openComplete(${job.id})">
         <svg viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Complete
+        ${t('completeAction')}
       </button>`;
     }
     if (job.status === 'complete') {
       rightActions += `<button class="btn btn-sm btn-warning" onclick="openEditJob(${job.id})">
         <svg viewBox="0 0 24 24" fill="none"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Edit
+        ${t('edit')}
       </button>`;
     }
+    rightActions += `<button class="btn btn-sm btn-danger" onclick="deleteJob(${job.id}, '${esc(job.title).replace(/'/g,"\\'")}')">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M3 6h18M8 6V4h8v2m-9 0l1 14h6l1-14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      ${t('delete')}
+    </button>`;
   } else {
     if (job.status === 'pending' && isAssigned && !hasAccepted) {
-      rightActions += `<button class="btn btn-sm btn-primary" onclick="acceptJob(${job.id})">Accept</button>`;
+      rightActions += `<button class="btn btn-sm btn-primary" onclick="acceptJob(${job.id})">${t('accept')}</button>`;
     } else if ((job.status === 'accepted' || job.status === 'pending') && hasAccepted && !hasSubmitted) {
-      rightActions += `<button class="btn btn-sm btn-success" onclick="openSubmit(${job.id})">Submit</button>`;
+      rightActions += `<button class="btn btn-sm btn-success" onclick="openSubmit(${job.id})">${t('submit')}</button>`;
     } else if (hasSubmitted) {
       rightActions += `<span class="badge badge-submitted" style="font-size:.75rem;">Submitted</span>`;
     }
   }
 
-  leftActions = `<button class="btn btn-sm btn-outline" onclick="openDetails(${job.id})">Details</button>`;
+  leftActions = `<button class="btn btn-sm btn-outline" onclick="openDetails(${job.id})">${t('details')}</button>`;
 
   return `<div class="job-card" id="job-card-${job.id}">
     <div class="job-card-header">
@@ -844,8 +957,8 @@ function clearJobRef() {
 async function loadUsers() {
   const list = document.getElementById('usersList');
   const historyList = document.getElementById('deletedUsersHistoryList');
-  list.innerHTML = '<div class="loading-state">Loading…</div>';
-  historyList.innerHTML = '<div class="loading-state">Loading…</div>';
+  list.innerHTML = `<div class="loading-state">${t('loading')}</div>`;
+  historyList.innerHTML = `<div class="loading-state">${t('loading')}</div>`;
   try {
     const [users, history] = await Promise.all([
       GET('/api/users'),
@@ -855,7 +968,7 @@ async function loadUsers() {
     state.deletedUserHistory = history;
 
     if (!state.users.length) {
-      list.innerHTML = '<div class="loading-state">No active users yet.</div>';
+      list.innerHTML = `<div class="loading-state">${t('noActiveUsers')}</div>`;
     } else {
       list.innerHTML = state.users.map(u => `
       <div class="user-card">
@@ -865,23 +978,23 @@ async function loadUsers() {
           <div class="user-card-joined">Joined ${formatDate(u.created_at)}</div>
         </div>
         <div class="user-card-actions">
-          <button class="btn btn-sm btn-danger" onclick="deleteUser(${u.id}, '${esc(u.username)}')">Delete</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteUser(${u.id}, '${esc(u.username)}')">${t('delete')}</button>
         </div>
       </div>`).join('');
     }
 
     if (!state.deletedUserHistory.length) {
-      historyList.innerHTML = '<div class="loading-state">No deleted account history.</div>';
+      historyList.innerHTML = `<div class="loading-state">${t('noDeletedHistory')}</div>`;
     } else {
       historyList.innerHTML = state.deletedUserHistory.map(h => `
         <div class="user-card">
           <div class="user-card-avatar" style="background:#64748b;">${(h.username || '?')[0].toUpperCase()}</div>
           <div class="user-card-info">
             <div class="user-card-name">${esc(h.username)}</div>
-            <div class="user-card-joined">Deleted ${formatDateTime(h.deleted_at)} by ${esc(h.deleted_by_admin_username || 'admin')}</div>
+            <div class="user-card-joined">${t('deletedBy', { time: formatDateTime(h.deleted_at), admin: esc(h.deleted_by_admin_username || 'admin') })}</div>
           </div>
           <div class="user-card-actions">
-            <button class="btn btn-sm btn-danger" onclick="deleteHistoryRecord(${h.id}, '${esc(h.username)}')">Delete History</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteHistoryRecord(${h.id}, '${esc(h.username)}')">${t('delete')}</button>
           </div>
         </div>
       `).join('');
@@ -910,10 +1023,6 @@ async function submitCreateUser() {
     showToast(`User "${username}" created`, 'success');
     closeModal('createUserModal');
     loadUsers();
-          rightActions += `<button class="btn btn-sm btn-danger" onclick="deleteJob(${job.id}, '${esc(job.title).replace(/'/g,"\\'")}')">
-            <svg viewBox="0 0 24 24" fill="none"><path d="M3 6h18M8 6V4h8v2m-9 0l1 14h6l1-14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            Delete
-          </button>`;
   } catch (err) {
     errEl.textContent = err.message;
     errEl.classList.remove('hidden');
@@ -921,7 +1030,7 @@ async function submitCreateUser() {
 }
 
 async function deleteUser(id, name) {
-  if (!confirm(`Delete user "${name}"? This cannot be undone.`)) return;
+  if (!confirm(t('deleteUserConfirm', { name }))) return;
   try {
     await DEL(`/api/users/${id}`);
     showToast(`User "${name}" deleted`, 'success');
@@ -932,7 +1041,7 @@ async function deleteUser(id, name) {
 }
 
 async function deleteJob(jobId, title) {
-  if (!confirm(`Delete job "${title}"? This cannot be undone.`)) return;
+  if (!confirm(t('deleteJobConfirm', { title }))) return;
   try {
     await DEL(`/api/jobs/${jobId}`);
     showToast(`Job "${title}" deleted`, 'success');
@@ -943,7 +1052,7 @@ async function deleteJob(jobId, title) {
 }
 
 async function deleteHistoryRecord(historyId, username) {
-  if (!confirm(`Delete history for "${username}"? This only removes the history record.`)) return;
+  if (!confirm(t('deleteHistoryConfirm', { name: username }))) return;
   try {
     await DEL(`/api/users/deleted-history/${historyId}`);
     showToast(`Deleted history for "${username}"`, 'success');
