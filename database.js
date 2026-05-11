@@ -96,13 +96,17 @@ async function initDB() {
       console.log('Created admin user');
     }
 
-    const user001Check = await client.query("SELECT id FROM users WHERE username = 'user001'");
-    if (!user001Check.rows.length) {
-      await client.query(
-        "INSERT INTO users (username, password, role) VALUES ($1, $2, 'user')",
-        ['user001', bcrypt.hashSync('user001', 10)]
-      );
-      console.log('Created user001');
+    // Optional demo user for first-time testing.
+    // Keep disabled by default so deleted users do not get recreated on restart.
+    if (process.env.SEED_DEMO_USER === 'true') {
+      const user001Check = await client.query("SELECT id FROM users WHERE username = 'user001'");
+      if (!user001Check.rows.length) {
+        await client.query(
+          "INSERT INTO users (username, password, role) VALUES ($1, $2, 'user')",
+          ['user001', bcrypt.hashSync('user001', 10)]
+        );
+        console.log('Created user001');
+      }
     }
 
     console.log('Database initialized');
