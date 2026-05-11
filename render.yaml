@@ -10,7 +10,7 @@ services:
         value: production
       - key: SESSION_SECRET
         generateValue: true
-      - key: DB_DIR
-        value: /tmp
+      - key: DATABASE_URL
+        sync: false
       - key: UPLOADS_DIR
         value: /tmp/uploads
