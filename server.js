@@ -211,6 +211,27 @@ app.get('/api/jobs', requireAuth, async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// ── DELETED HISTORY (must come before :id routes) ──────────────────────
+app.get('/api/jobs/deleted-history', requireAdmin, async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT id, deleted_job_id, title, description, status, original_created_at, deleted_at,
+              deleted_by_admin_id, deleted_by_admin_username
+       FROM deleted_jobs_history
+       ORDER BY deleted_at DESC`
+    );
+    res.json(rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.delete('/api/jobs/deleted-history/:historyId', requireAdmin, async (req, res) => {
+  try {
+    const result = await pool.query('DELETE FROM deleted_jobs_history WHERE id = $1', [req.params.historyId]);
+    if (result.rowCount === 0) return res.status(404).json({ error: 'History record not found' });
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 app.get('/api/jobs/:id', requireAuth, async (req, res) => {
   try {
     const job = (await pool.query('SELECT * FROM jobs WHERE id = $1', [req.params.id])).rows[0];
@@ -345,26 +366,6 @@ app.delete('/api/jobs/:id', requireAdmin, async (req, res) => {
   } finally {
     client.release();
   }
-});
-
-app.get('/api/jobs/deleted-history', requireAdmin, async (req, res) => {
-  try {
-    const { rows } = await pool.query(
-      `SELECT id, deleted_job_id, title, description, status, original_created_at, deleted_at,
-              deleted_by_admin_id, deleted_by_admin_username
-       FROM deleted_jobs_history
-       ORDER BY deleted_at DESC`
-    );
-    res.json(rows);
-  } catch (err) { res.status(500).json({ error: err.message }); }
-});
-
-app.delete('/api/jobs/deleted-history/:historyId', requireAdmin, async (req, res) => {
-  try {
-    const result = await pool.query('DELETE FROM deleted_jobs_history WHERE id = $1', [req.params.historyId]);
-    if (result.rowCount === 0) return res.status(404).json({ error: 'History record not found' });
-    res.json({ success: true });
-  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.post('/api/jobs/:id/accept', requireAuth, async (req, res) => {

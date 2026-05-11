@@ -29,7 +29,7 @@ const state = {
 
 const I18N = {
   en: {
-    loginSubtitle: 'Sign in to continue', loginUsername: 'Username', loginPassword: 'Password', signIn: 'Sign In', signingIn: 'Signing in…',
+    appTitle: 'Job Platform', loginSubtitle: 'Sign in to continue', loginUsername: 'Username', loginPassword: 'Password', signIn: 'Sign In', signingIn: 'Signing in…',
     dashboard: 'Dashboard', chatRoom: 'Chat Room', userManagement: 'User Management', logout: 'Logout',
     notifications: 'Notifications', markAllRead: 'Mark all read', noNotifications: 'No notifications',
     all: 'All', pending: 'Pending', accepted: 'Accepted', submitted: 'Submitted', complete: 'Complete', newJob: 'New Job', hideComplete: 'Hide Complete',
@@ -47,14 +47,14 @@ const I18N = {
     postTime: 'Post Time', acceptTime: 'Accept Time', submitTime: 'Submit Time', lastEdited: 'Last Edited', by: 'By',
   },
   'zh-Hans': {
-    loginSubtitle: '登录后继续', loginUsername: '用户名', loginPassword: '密码', signIn: '登录', signingIn: '登录中…',
+    appTitle: '工作平台', loginSubtitle: '登录后继续', loginUsername: '用户名', loginPassword: '密码', signIn: '登录', signingIn: '登录中…',
     dashboard: '看板', chatRoom: '聊天室', userManagement: '用户管理', logout: '退出登录',
     notifications: '通知', markAllRead: '全部标记已读', noNotifications: '暂无通知',
-    all: '全部', pending: '待处理', accepted: '已接受', submitted: '已提交', complete: '已完成', newJob: '新建任务',
+    all: '全部', pending: '待处理', accepted: '已接受', submitted: '已提交', complete: '已完成', newJob: '新建任务', hideComplete: '隐藏已完成',
     channels: '频道', generalChat: '公共聊天', jobChannels: '任务频道',
-    userAccounts: '用户账号', addUser: '新增用户', deletedHistory: '已删除账号记录',
+    userAccounts: '用户账号', addUser: '新增用户', deletedHistory: '已删除账号记录', deletedPostHistory: '已删除工作记录',
     jobs: '任务', chat: '聊天', users: '用户', administrator: '管理员', user: '用户',
-    loading: '加载中…', noActiveUsers: '暂无有效用户。', noDeletedHistory: '暂无删除记录。',
+    loading: '加载中…', noActiveUsers: '暂无有效用户。', noDeletedHistory: '暂无删除记录。', noDeletedPostHistory: '没有已删除工作记录。',
     delete: '删除', edit: '编辑', details: '详情', accept: '接受', submit: '提交', completeAction: '完成',
     deleteJobConfirm: '确定删除任务“{title}”？此操作不可恢复。', deleteUserConfirm: '确定删除用户“{name}”？此操作不可恢复。',
     deleteHistoryConfirm: '确定删除“{name}”的历史记录？仅删除记录本身。',
@@ -65,7 +65,7 @@ const I18N = {
     postTime: '发布时间', acceptTime: '接受时间', submitTime: '提交时间', lastEdited: '最后编辑', by: '者',
   },
   'zh-Hant': {
-    loginSubtitle: '登入後繼續', loginUsername: '用戶名稱', loginPassword: '密碼', signIn: '登入', signingIn: '登入中…',
+    appTitle: '工作平台', loginSubtitle: '登入後繼續', loginUsername: '用戶名稱', loginPassword: '密碼', signIn: '登入', signingIn: '登入中…',
     dashboard: '看板', chatRoom: '聊天室', userManagement: '用戶管理', logout: '登出',
     notifications: '通知', markAllRead: '全部標記為已讀', noNotifications: '沒有通知',
     all: '全部', pending: '待處理', accepted: '已接受', submitted: '已提交', complete: '已完成', newJob: '新增工作', hideComplete: '隱藏已完成',

@@ -19,11 +19,11 @@
     <form id="loginForm" autocomplete="on">
       <div class="form-group">
         <label for="loginUsername" id="loginUsernameLabel">Username</label>
-        <input type="text" id="loginUsername" name="username" autocomplete="username" placeholder="Enter username" required />
+        <input type="text" id="loginUsername" name="username" autocomplete="username" required />
       </div>
       <div class="form-group">
         <label for="loginPassword" id="loginPasswordLabel">Password</label>
-        <input type="password" id="loginPassword" name="password" autocomplete="current-password" placeholder="Enter password" required />
+        <input type="password" id="loginPassword" name="password" autocomplete="current-password" required />
       </div>
       <div id="loginError" class="form-error hidden"></div>
       <button type="submit" class="btn btn-primary btn-full" id="loginBtn">Sign In</button>
@@ -236,11 +236,11 @@
         <input type="hidden" id="jobFormId" />
         <div class="form-group">
           <label>Title <span class="required">*</span></label>
-          <input type="text" id="jobTitle" placeholder="e.g. Event Poster" required />
+          <input type="text" id="jobTitle" required />
         </div>
         <div class="form-group">
           <label>Description</label>
-          <textarea id="jobDescription" rows="4" placeholder="Describe the task…"></textarea>
+          <textarea id="jobDescription" rows="4"></textarea>
         </div>
         <div class="form-group">
           <label>Time Limit</label>
@@ -304,7 +304,7 @@
       <input type="hidden" id="completeJobId" />
       <div class="form-group">
         <label>Comments (optional)</label>
-        <textarea id="completeComments" rows="3" placeholder="e.g. Well Done! or You are late!"></textarea>
+        <textarea id="completeComments" rows="3"></textarea>
       </div>
     </div>
     <div class="modal-footer">
@@ -332,7 +332,7 @@
         <label>Submission Files (optional)</label>
         <div class="file-upload-area" onclick="document.getElementById('submitFilesInput').click()">
           <svg viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <span>Click to attach files</span>
+          <span>Click to upload files</span>
         </div>
         <input type="file" id="submitFilesInput" multiple hidden onchange="handleSubmitFileSelect(event)" />
         <div id="submitFilesList" class="selected-files-list"></div>
@@ -355,11 +355,11 @@
     <div class="modal-body">
       <div class="form-group">
         <label>Username <span class="required">*</span></label>
-        <input type="text" id="newUsername" placeholder="Enter username" />
+        <input type="text" id="newUsername" />
       </div>
       <div class="form-group">
         <label>Password <span class="required">*</span></label>
-        <input type="password" id="newPassword" placeholder="Enter password" />
+        <input type="password" id="newPassword" />
       </div>
       <div id="createUserError" class="form-error hidden"></div>
     </div>
