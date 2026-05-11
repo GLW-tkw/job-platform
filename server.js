@@ -1,5 +1,6 @@
 const express = require('express');
 const session = require('express-session');
+const pgSession = require('connect-pg-simple')(session);
 const multer = require('multer');
 const path = require('path');
 const http = require('http');
@@ -25,6 +26,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(uploadsDir));
 app.use(session({
   secret: process.env.SESSION_SECRET || 'jp-secret-change-in-production-xyz987',
+  store: new pgSession({
+    pool,
+    tableName: 'user_sessions',
+    createTableIfMissing: true,
+  }),
   resave: false,
   saveUninitialized: false,
   cookie: {
